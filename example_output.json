@@ -1,0 +1,70 @@
+{
+   "sentiment":{
+      // "guiding_questions":{
+         "questions":[
+            //[
+               "Does the comment express a dislike or hatred towards a specific group?",
+               "Is there any indication of violent intentions or wishes in the comment?",
+               "Does the comment use strong language to convey negative feelings towards the group?"
+            //]
+         ]
+      // },
+      "similar_comments":[
+         "Hate from india",
+         "You sure love to hate on Indians."
+      ],
+      "disagreeing_comments":{
+         "As an Indian I love this post":{
+            "strongly negative":0,
+            "somewhat negative":0,
+            "neutral":1,
+            "somewhat positive":1,
+            "strongly positive":1
+         },
+         "LOL. Barbaric and brainwashed clowns making comments about India... They love to display their ignorance and stupidity, which is a result of their limited intelligence.":{
+            "strongly negative":0,
+            "somewhat negative":1,
+            "neutral":0,
+            "somewhat positive":1,
+            "strongly positive":0
+         }
+      }
+   },
+   "table_info":{
+      "Hate from india":[
+        [
+         "somewhat negative"
+        ]
+      ],
+      "You sure love to hate on Indians.":[
+        [
+         "neutral"
+        ]
+      ],
+      "I hate Indians they are terrorists. Killing thousands people in Kashmir.":[
+        [
+         "strongly negative"
+        ]
+      ],
+      "now we hate india lot of more":[
+        [
+         "somewhat negative"
+        ]
+      ],
+      "Only motherfuckers hate India,":[
+         [
+            "somewhat negative"
+         ]
+      ],
+      "suggestion":[
+         [
+            "strongly negative",
+            "somewhat negative",
+            "neutral"
+         ]
+      ]
+   },
+   "targeted_subgroups":[
+      "{\"National origin or citizenship status\": [\"A specific country\"]}"
+   ]
+}
