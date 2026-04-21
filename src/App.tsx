@@ -9,6 +9,13 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Tooltip from "@mui/material/Tooltip";
 
+import {
+  VictoryChart,
+  VictoryBar,
+  VictoryTheme,
+  VictoryAxis
+} from "victory";
+
 type Option = {
   label: string;
   value: string;
@@ -32,14 +39,17 @@ const App: React.FC = () => {
   const [comment, setComment] = useState("")
   const [tableInfo, setTableInfo] = useState<Record<string, string[][]>>({});
   const [displayAttributesForTable, setDisplayAttributesForTable] = useState<Option[]>([]);
-  const [displayTable, setDisplayTable] = useState(false);
+  const [displayOnSubmit, setDisplayOnSubmit] = useState(false);
   const [guidingQuestions, setGuidingQuestions] = useState<Record<string, string[]>>({});
+  const [similarComments, setSimilarComments] = useState<Record<string, string[]>>({});
+  const [disagreeingComments, setDisagreeingComments] = useState<Record<string, Record<string, number>>>({});
   const table_rows = Object.entries(tableInfo).map(
     ([comment, rating]) => ({
       name: comment,
       labels: rating,
     })
-  );  
+  ); 
+
 
 const mockTableInfo = {
    "sentiment":{
@@ -131,6 +141,8 @@ const mockTableInfo = {
       // const data = await response.json();
       const data = {table_info: mockTableInfo}
       let guiding_questions: Record<string, string[]> = {};
+      let similar_comments: Record<string, string[]> = {};
+      let disagreeing_comments: Record<string, Record<string, number>> = {};
       for (const key of Object.keys(mockTableInfo))
       {
         if (key === "tableInfo" || key === "targeted_subgroups")
@@ -140,20 +152,39 @@ const mockTableInfo = {
         else
         {
           guiding_questions[key] = mockTableInfo[key]["questions"];
+          similar_comments[key] = mockTableInfo[key]["similar_comments"];
+          disagreeing_comments[key] = mockTableInfo[key]["disagreeing_comments"];
         }
       }
       setGuidingQuestions(guiding_questions);
       setTableInfo(mockTableInfo.table_info);
-      setDisplayTable(true); 
+      setSimilarComments(similar_comments);
+      setDisagreeingComments(disagreeing_comments);
+      setDisplayOnSubmit(true); 
       
   } catch(err){
     console.log(err);
   }
 }
   return (
-    <>
-    <div style={{ width: 300, margin: "50px auto" }}>
+  <>
+  <div className="form-container">
+
+    {/* Input */}
+    <div className="form-field">
+      <input
+        type="text"
+        className="form-input"
+        onChange={(e) => setComment(e.target.value)}
+        placeholder="Enter comment..."
+      />
+    </div>
+
+    {/* Dropdown */}
+    <div className="form-field">
       <Select
+        className="react-select-container"
+        classNamePrefix="react-select"
         isMulti
         options={options}
         value={selected}
@@ -161,9 +192,30 @@ const mockTableInfo = {
         placeholder="Select options..."
       />
     </div>
-    <input type="text" onChange={(e) => setComment(e.target.value)}></input>
-    <button onClick={handleSubmit}>Submit</button>
-    {displayTable && (
+
+    {/* Button */}
+    <div className="form-field">
+      <button className="form-button" onClick={handleSubmit}>
+        Submit
+      </button>
+    </div>
+
+  </div>
+  
+    {/* <div style={{ width: 300, margin: "50px auto", display: "flex", flexDirection: "column" }}>
+      <Select
+        isMulti
+        options={options}
+        value={selected}
+        onChange={(newValue) => setSelected(newValue as Option[])}
+        placeholder="Select options..."
+      />
+      <input type="text" onChange={(e) => setComment(e.target.value)}></input>
+      <button onClick={handleSubmit}>Submit</button>
+    </div> */}
+    {/* <input type="text" onChange={(e) => setComment(e.target.value)}></input>
+    <button onClick={handleSubmit}>Submit</button> */}
+    {displayOnSubmit && (
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
         <TableHead>
@@ -179,7 +231,7 @@ const mockTableInfo = {
                       .map((q) => `- ${q}`)
                       .join("\n")}
                   </div>
-  }
+                }
               >
                 <div>{key.label}</div>
               </Tooltip>
@@ -210,9 +262,51 @@ const mockTableInfo = {
         </TableBody>
       </Table>
     </TableContainer>
-  )}
+    )}
+    <p>Below, comments that received similar ratings for each attribute, and comments that received dissimilar ratings are displayed. 
+      Similar comments are the comments that are most semnantically similar to your comment and had similar ratings from past annotators.
+      Disagreeing comments are the comments that are most semnantically similar to your comment but 
+      received disimilar ratings from past annotators.</p>
+    {displayAttributesForTable.map((key) => (
+      <div key={key.value}>
+        <h2>{key.label}</h2>
+        <h3>Similar Comments</h3>
+
+        <ul>
+          {(similarComments[key.value] || []).map((q, i) => (
+            <li key={i}>{q}</li>
+          ))}
+        </ul>
+      <div>
+      <h3>Disagreeing Comments</h3>  
+      {Object.entries(disagreeingComments[key.value] || {}).map(([comment, scores]) => {
+        const graph_data = Object.entries(scores).map(([rating_class, count]) => ({
+          x: rating_class,
+          y: count,
+        }));
+
+        return (
+          <div key={comment} style={{ marginBottom: 40 }}>
+            <h4>{comment}</h4>
+
+            <VictoryChart
+              domainPadding={{ x: 20 }}
+              theme={VictoryTheme.clean}
+            >
+              <VictoryAxis />
+              <VictoryAxis dependentAxis />
+              <VictoryBar data={graph_data} />
+            </VictoryChart>
+          </div>
+        );
+      })}
+    </div>
+      </div>
+    ))}
   </>
   );
 };
+
+
 
 export default App;

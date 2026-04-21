@@ -17,7 +17,8 @@
     "@mui/material": "^9.0.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
-    "react-select": "^5.10.2"
+    "react-select": "^5.10.2",
+    "victory": "^37.3.6"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
