@@ -9,12 +9,57 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Tooltip from "@mui/material/Tooltip";
 
+import "./App.css";
+
 import {
   VictoryChart,
   VictoryBar,
   VictoryTheme,
-  VictoryAxis
+  VictoryAxis,
+  VictoryContainer,
 } from "victory";
+
+const GUIDING_TOOLTIP_SLOT_PROPS = {
+  tooltip: {
+    className: "guiding-tooltip-slot",
+    sx: {
+      maxWidth: 400,
+      px: 2,
+      py: 1.5,
+      bgcolor: "rgba(15, 23, 42, 0.82)",
+      color: "#f1f5f9",
+      fontSize: "0.8125rem",
+      fontFamily: "var(--sans)",
+      lineHeight: 1.45,
+      border: "1px solid rgba(248, 250, 252, 0.14)",
+      boxShadow: "0 10px 28px rgba(0, 0, 0, 0.18)",
+      backdropFilter: "blur(8px)",
+    },
+  },
+} as const;
+
+function GuidingQuestionsTooltipBody({ questions }: { questions: string[] }) {
+  return (
+    <div className="guiding-tooltip">
+      {questions.map((q, i) => {
+        const lines = q
+          .split(/\n/)
+          .map((line) => line.trim())
+          .filter((line) => line.length > 0);
+        if (lines.length === 0) return null;
+        return (
+          <div key={i} className="guiding-tooltip__question">
+            {lines.map((line, j) => (
+              <div key={j} className="guiding-tooltip__line">
+                {j === 0 ? `– ${line}` : line}
+              </div>
+            ))}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 
 type Option = {
   label: string;
@@ -37,7 +82,7 @@ const options: Option[] = [
 const App: React.FC = () => {
   const [selected, setSelected] = useState<Option[]>([]);
   const [comment, setComment] = useState("")
-  const [tableInfo, setTableInfo] = useState<Record<string, string[][]>>({});
+  const [tableInfo, setTableInfo] = useState<Record<string, Record<string, string[]>>>({});
   const [displayAttributesForTable, setDisplayAttributesForTable] = useState<Option[]>([]);
   const [displayOnSubmit, setDisplayOnSubmit] = useState(false);
   const [guidingQuestions, setGuidingQuestions] = useState<Record<string, string[]>>({});
@@ -80,38 +125,41 @@ const mockTableInfo = {
       }
    },
    "table_info":{
-      "Hate from india":[
-        [
-         "somewhat negative"
-        ]
-      ],
-      "You sure love to hate on Indians.":[
-        [
-         "neutral"
-        ]
-      ],
-      "I hate Indians they are terrorists. Killing thousands people in Kashmir.":[
-        [
-         "strongly negative"
-        ]
-      ],
-      "now we hate india lot of more":[
-        [
-         "somewhat negative"
-        ]
-      ],
-      "Only motherfuckers hate India,":[
-         [
-            "somewhat negative"
-         ]
-      ],
-      "suggestion":[
-         [
-            "strongly negative",
-            "somewhat negative",
-            "neutral"
-         ]
-      ]
+      "Hate from india":
+        {
+         "sentiment":["somewhat negative"]
+        }
+      ,
+      "You sure love to hate on Indians.":
+        {
+         "sentiment": ["neutral"]
+        }
+      ,
+      "I hate Indians they are terrorists. Killing thousands people in Kashmir.":
+        { 
+         "sentiment": ["strongly negative"] 
+        }
+      ,
+      "now we hate india lot of more":
+        { 
+         "sentiment": ["somewhat negative"]
+        }
+      ,
+      "Only motherfuckers hate India,":
+        { 
+          "sentiment": ["somewhat negative"]
+        }
+      ,
+      "suggestion":
+         { 
+            "sentiment":
+            [
+              "strongly negative",
+              "somewhat negative",
+              "neutral"
+            ]
+        }
+    
    },
    "targeted_subgroups":[
       "{\"National origin or citizenship status\": [\"A specific country\"]}"
@@ -121,14 +169,15 @@ const mockTableInfo = {
   const handleSubmit = async () => 
   {
     if (selected.length === 0) {
-      alert("Please select at least one survey item")
+      alert("Please select at least one survey item");
+      return;
     }
     if (comment === "") {
       alert("Please put in a comment to annotate");
       return;
     }
+    const selectedOptions = new Set(selected.map((option) => option.value));
     setDisplayAttributesForTable(selected);
-    let selected_options = selected.map((option) => option.value)
     try {
       // const response = await fetch('http://localhost:8000/chat', {
       //   method: 'POST',
@@ -139,13 +188,12 @@ const mockTableInfo = {
       // });
     
       // const data = await response.json();
-      const data = {table_info: mockTableInfo}
       let guiding_questions: Record<string, string[]> = {};
       let similar_comments: Record<string, string[]> = {};
       let disagreeing_comments: Record<string, Record<string, number>> = {};
       for (const key of Object.keys(mockTableInfo))
       {
-        if (key === "tableInfo" || key === "targeted_subgroups")
+        if (key === "table_info" || key === "targeted_subgroups" || !selectedOptions.has(key))
         {
           continue;
         }
@@ -168,6 +216,9 @@ const mockTableInfo = {
 }
   return (
   <>
+  <div className="form-intro">
+    <h1 className="app-title">Data Annotation Assistant</h1>
+  </div>
   <div className="form-container">
 
     {/* Input */}
@@ -216,25 +267,37 @@ const mockTableInfo = {
     {/* <input type="text" onChange={(e) => setComment(e.target.value)}></input>
     <button onClick={handleSubmit}>Submit</button> */}
     {displayOnSubmit && (
-    <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 650 }} aria-label="simple table">
+    <TableContainer component={Paper} className="annotation-table" elevation={0}>
+      <Table className="annotation-table__table" sx={{ minWidth: 650 }} aria-label="annotation results">
         <TableHead>
           <TableRow>
-            <TableCell align="left">Comment</TableCell>
+            <TableCell align="left" className="annotation-table__head-cell">Comment</TableCell>
             {displayAttributesForTable.map((key) => (
-              <TableCell align="left" key={key.label}>
-              <Tooltip
-                describeChild
-                title={
-                  <div style={{ whiteSpace: "pre-line" }}>
-                    {(guidingQuestions[key.value] || [])
-                      .map((q) => `- ${q}`)
-                      .join("\n")}
-                  </div>
-                }
-              >
-                <div>{key.label}</div>
-              </Tooltip>
+              <TableCell align="left" key={key.label} className="annotation-table__head-cell">
+                <div className="annotation-table__head-wrap">
+                  <span className="annotation-table__head-text">{key.label}</span>
+                  <Tooltip
+                    describeChild
+                    placement="top"
+                    slotProps={GUIDING_TOOLTIP_SLOT_PROPS}
+                    title={
+                      <GuidingQuestionsTooltipBody
+                        questions={guidingQuestions[key.value] || []}
+                      />
+                    }
+                  >
+                    <span
+                      className="annotation-table__info-bubble"
+                      tabIndex={0}
+                      role="img"
+                      aria-label={`Guiding questions for ${key.label}`}
+                    >
+                      <span className="annotation-table__info-bubble-char" aria-hidden="true">
+                        i
+                      </span>
+                    </span>
+                  </Tooltip>
+                </div>
               </TableCell>
             )
             )}
@@ -245,16 +308,20 @@ const mockTableInfo = {
             return <>
               <TableRow
                 key={row.name}
+                className="annotation-table__body-row"
                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
               >
-                <TableCell component="th" scope="row">
+                <TableCell component="th" scope="row" className="annotation-table__comment-cell">
                   {row.name}
                 </TableCell>
-                {row.labels.map((attribute_list, idx) => (
-                  <TableCell key={idx} align="left">
-                    {attribute_list.join(", ")}
-                  </TableCell>
-                ))}
+                {displayAttributesForTable.map((attribute) => {
+                  const ratings = row.labels[attribute.value] || [];
+                  return (
+                    <TableCell key={attribute.value} align="left" className="annotation-table__body-cell">
+                      {ratings.join(", ")}
+                    </TableCell>
+                  );
+                })}
               </TableRow>  
             </>
           }
@@ -263,45 +330,124 @@ const mockTableInfo = {
       </Table>
     </TableContainer>
     )}
-    <p>Below, comments that received similar ratings for each attribute, and comments that received dissimilar ratings are displayed. 
-      Similar comments are the comments that are most semnantically similar to your comment and had similar ratings from past annotators.
-      Disagreeing comments are the comments that are most semnantically similar to your comment but 
-      received disimilar ratings from past annotators.</p>
-    {displayAttributesForTable.map((key) => (
-      <div key={key.value}>
-        <h2>{key.label}</h2>
-        <h3>Similar Comments</h3>
-
-        <ul>
-          {(similarComments[key.value] || []).map((q, i) => (
-            <li key={i}>{q}</li>
-          ))}
-        </ul>
-      <div>
-      <h3>Disagreeing Comments</h3>  
-      {Object.entries(disagreeingComments[key.value] || {}).map(([comment, scores]) => {
-        const graph_data = Object.entries(scores).map(([rating_class, count]) => ({
-          x: rating_class,
-          y: count,
-        }));
-
-        return (
-          <div key={comment} style={{ marginBottom: 40 }}>
-            <h4>{comment}</h4>
-
-            <VictoryChart
-              domainPadding={{ x: 20 }}
-              theme={VictoryTheme.clean}
-            >
-              <VictoryAxis />
-              <VictoryAxis dependentAxis />
-              <VictoryBar data={graph_data} />
-            </VictoryChart>
-          </div>
-        );
-      })}
+    {displayOnSubmit && (
+    <div className="info-blurb">
+      <p className="info-blurb__lead">
+        For each attribute below, you’ll see two kinds of comparisons: comments with{" "}
+        <strong>similar</strong> ratings to yours, and comments with{" "}
+        <strong>dissimilar</strong> ratings.
+      </p>
+      <p className="info-blurb__para">
+        <strong>Similar comments</strong> are the ones that are most semantically like your
+        comment and tended to receive similar ratings from past annotators.
+      </p>
+      <p className="info-blurb__para">
+        <strong>Disagreeing comments</strong> are also semantically like your comment, but past
+        annotators gave them noticeably different ratings.
+      </p>
     </div>
-      </div>
+    )}
+    {displayAttributesForTable.map((key) => (
+      <details key={key.value} className="attribute-collapse" open>
+        <summary className="attribute-collapse__summary">
+          <h2 className="attribute-collapse__title">{key.label}</h2>
+        </summary>
+        <div className="attribute-collapse__body">
+          <h3>Similar Comments</h3>
+
+          <ul className="comment-list">
+            {(similarComments[key.value] || []).map((q, i) => (
+              <li key={i} className="result-comment">
+                {q}
+              </li>
+            ))}
+          </ul>
+
+          <h3>Disagreeing Comments</h3>
+          <ul className="comment-list disagreeing-list">
+            {Object.entries(disagreeingComments[key.value] || {}).map(([comment, scores]) => {
+              const graph_data = Object.entries(scores).map(([rating_class, count]) => ({
+                x: rating_class,
+                y: count,
+              }));
+
+              return (
+                <li key={comment} className="disagreeing-list__item">
+                  <div className="chart-wrap">
+                    <p className="result-comment chart-wrap__comment">{comment}</p>
+
+                    <div className="chart-responsive">
+                      <VictoryChart
+                        width={560}
+                        height={320}
+                        domainPadding={{ x: 20 }}
+                        padding={{ top: 24, bottom: 112, left: 72, right: 28 }}
+                        theme={VictoryTheme.clean}
+                        containerComponent={
+                          <VictoryContainer
+                            responsive
+                            style={{ width: "100%", height: "100%" }}
+                          />
+                        }
+                      >
+                        <VictoryAxis
+                          label="Rating"
+                          style={{
+                            axisLabel: {
+                              fontFamily: "inherit",
+                              fontSize: 13,
+                              fontWeight: 700,
+                              fill: "#7f7385",
+                              padding: 72,
+                            },
+                            tickLabels: {
+                              fontFamily: "inherit",
+                              fontSize: 11,
+                              angle: -32,
+                              textAnchor: "end",
+                              padding: 4,
+                              fill: "#7f7385",
+                            },
+                            axis: { stroke: "#cbd5e1" },
+                            ticks: { stroke: "#cbd5e1", size: 5 },
+                          }}
+                        />
+                        <VictoryAxis
+                          dependentAxis
+                          label="Number of Annotators"
+                          style={{
+                            axisLabel: {
+                              fontFamily: "inherit",
+                              fontSize: 13,
+                              fontWeight: 700,
+                              fill: "#7f7385",
+                              padding: 60,
+                            },
+                            tickLabels: {
+                              fontFamily: "inherit",
+                              fontSize: 11,
+                              fill: "#b8acc0",
+                            },
+                            axis: { stroke: "#d5d5d5" },
+                            grid: { stroke: "#e4e4e4", strokeDasharray: "4 4" },
+                            ticks: { stroke: "#d5d5d5", size: 5 },
+                          }}
+                        />
+                        <VictoryBar
+                          data={graph_data}
+                          barRatio={0.7}
+                          style={{ data: { fill: "#8f8396", fillOpacity: 1 } }}
+                          cornerRadius={3}
+                        />
+                      </VictoryChart>
+                    </div>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      </details>
     ))}
   </>
   );

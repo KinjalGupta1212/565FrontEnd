@@ -1,50 +1,526 @@
-/* Global consistency */
-* {
+/* Typography: one stack for the whole app (matches index.css :root) */
+:root {
+  --bg-1: #fefefe;
+  --bg-2: #efefef;
+  --bg-3: #e4e4e4;
+  --border-soft: #d5d5d5;
+  --text-soft-purple: #b8acc0;
+  --text-strong-purple: #7f7385;
+}
+
+#root {
+  padding: 1.5rem clamp(1rem, 4vw, 2.5rem);
+  background: linear-gradient(160deg, var(--bg-1) 0%, var(--bg-2) 55%, var(--bg-3) 100%);
+  color: #111111;
+  line-height: 1.55;
+  box-sizing: border-box;
+  font-family: var(--sans);
+  font-size: 1rem;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root,
+#root button,
+#root input,
+#root select,
+#root textarea {
+  font-family: inherit;
+}
+
+/* Shared width for results table, intro blurb, and attribute cards */
+.annotation-table.MuiPaper-root,
+.info-blurb,
+.attribute-collapse {
+  width: min(52rem, 100%);
+  max-width: 52rem;
+  margin-left: auto;
+  margin-right: auto;
   box-sizing: border-box;
 }
 
-/* Page container */
+.info-blurb {
+  margin-bottom: 1.25rem;
+  padding: 1.15rem 1.35rem 1.25rem;
+  background: rgba(254, 254, 254, 0.95);
+  border-radius: 10px;
+  border: 1px solid var(--border-soft);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+  text-align: left;
+  font-size: 0.9375rem;
+  line-height: 1.62;
+  color: #111111;
+}
+
+.info-blurb__lead {
+  margin: 0 0 1rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #111111;
+  line-height: 1.55;
+}
+
+.info-blurb__para {
+  margin: 0 0 0.9rem;
+  max-width: 48rem;
+}
+
+.info-blurb__para:last-child {
+  margin-bottom: 0;
+}
+
+.info-blurb strong {
+  font-weight: 800;
+  color: #1a1a1a;
+  letter-spacing: 0.01em;
+}
+
+.form-intro {
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto 1.25rem;
+  padding: 0.25rem 0 0;
+  text-align: center;
+}
+
+.app-title {
+  margin: 0 auto;
+  font-family: inherit;
+  font-size: 42px;
+  font-weight: 700;
+  color: #111111;
+  letter-spacing: -0.04em;
+  line-height: 1.12;
+}
+
+/* --- Form: vertical stack, equal width --- */
 .form-container {
-  width: 600px;
-  margin: 50px auto;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-}
-
-/* Shared field wrapper */
-.form-field {
+  gap: 0.875rem;
   width: 100%;
+  max-width: 28rem;
+  margin: 0 auto 2rem;
+  padding: 1.25rem 1.35rem;
+  background: var(--bg-1);
+  border-radius: 12px;
+  border: 1px solid var(--border-soft);
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.07);
+  text-align: left;
 }
 
-/* Input */
+.form-container .form-field {
+  width: 100%;
+  margin: 0;
+}
+
 .form-input {
   width: 100%;
-  height: 38px;
-  padding: 8px 10px;
-  font-size: 14px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  box-sizing: border-box;
+  padding: 0.65rem 0.85rem;
+  font-size: 0.9375rem;
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  background: var(--bg-1);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-/* Button */
+.form-input::placeholder {
+  color: var(--text-soft-purple);
+}
+
+.form-input:hover {
+  border-color: var(--text-soft-purple);
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--text-strong-purple);
+  box-shadow: 0 0 0 3px rgba(127, 115, 133, 0.18);
+  background: var(--bg-1);
+}
+
+.form-container .react-select-container {
+  width: 100%;
+  font-size: 0.9375rem;
+}
+
+.form-container .react-select__control {
+  min-height: 42px;
+  border-radius: 8px !important;
+  border-color: var(--border-soft) !important;
+  box-shadow: none !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  font-family: inherit;
+}
+
+.form-container .react-select__single-value,
+.form-container .react-select__input-container,
+.form-container .react-select__placeholder,
+.form-container .react-select__multi-value__label {
+  font-family: inherit;
+  font-size: 0.9375rem;
+}
+
+.form-container .react-select__control:hover {
+  border-color: var(--text-soft-purple) !important;
+}
+
+.form-container .react-select__control--is-focused {
+  border-color: var(--text-strong-purple) !important;
+  box-shadow: 0 0 0 3px rgba(127, 115, 133, 0.18) !important;
+}
+
+.form-container .react-select__menu {
+  border-radius: 8px;
+  border: 1px solid rgba(30, 41, 59, 0.1);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+  font-family: inherit;
+  font-size: 0.9375rem;
+}
+
 .form-button {
   width: 100%;
-  height: 38px;
-  font-size: 14px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  box-sizing: border-box;
+  padding: 0.7rem 1rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #f8fafc;
+  background: linear-gradient(180deg, #8f8396 0%, #7f7385 100%);
+  border: none;
+  border-radius: 8px;
   cursor: pointer;
-  background: white;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+  box-shadow:
+    0 2px 10px rgba(15, 23, 42, 0.28),
+    inset 0 -2px 0 #6f6475;
 }
 
-/* react-select container */
-.react-select-container {
+.form-button:hover {
+  filter: brightness(1.06);
+  box-shadow:
+    0 4px 16px rgba(15, 23, 42, 0.35),
+    inset 0 -2px 0 #6f6475;
+}
+
+.form-button:active {
+  transform: translateY(1px);
+}
+
+/* --- Results table --- */
+.annotation-table.MuiPaper-root {
+  margin-bottom: 1.5rem;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border-soft);
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 8px 24px rgba(15, 23, 42, 0.08) !important;
+  background: #fff !important;
+  font-family: inherit;
+}
+
+.annotation-table__table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.annotation-table__head-cell {
+  font-family: inherit !important;
+  font-weight: 700 !important;
+  font-size: 0.75rem !important;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #f8fafc !important;
+  background: linear-gradient(180deg, #8f8396 0%, #7f7385 100%) !important;
+  border-bottom: 2px solid #6f6475 !important;
+  padding-top: 14px !important;
+  padding-bottom: 14px !important;
+  line-height: 1.35 !important;
+  vertical-align: top !important;
+  overflow: visible !important;
+}
+
+.annotation-table__head-wrap {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.35rem;
+  max-width: 100%;
+}
+
+.annotation-table__head-text {
+  display: inline;
+  line-height: 1.35;
+}
+
+.annotation-table__info-bubble {
+  box-sizing: border-box;
+  width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 50%;
+  border: 1px solid rgba(248, 250, 252, 0.55);
+  background: rgba(255, 255, 255, 0.18);
+  color: #f8fafc;
+  cursor: help;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  flex-shrink: 0;
+  text-transform: none;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.12s ease;
+}
+
+.annotation-table__info-bubble:hover,
+.annotation-table__info-bubble:focus-visible {
+  background: rgba(255, 255, 255, 0.32);
+  border-color: rgba(248, 250, 252, 0.85);
+  outline: none;
+}
+
+.annotation-table__info-bubble:focus-visible {
+  box-shadow: 0 0 0 2px rgba(127, 115, 133, 0.55);
+}
+
+.annotation-table__info-bubble-char {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  font-style: normal;
+  font-family: inherit;
+  text-transform: none;
+  line-height: 1;
+  margin-top: 1px;
+}
+
+.annotation-table__body-row:nth-child(even) {
+  background: #f8fafc;
+}
+
+.annotation-table__body-row:hover {
+  background: #f1f5f9;
+}
+
+.annotation-table__comment-cell {
+  font-family: inherit !important;
+  font-weight: 600 !important;
+  font-size: 0.875rem !important;
+  color: #0f172a !important;
+  max-width: 18rem;
+  vertical-align: top;
+  border-color: rgba(30, 41, 59, 0.08) !important;
+}
+
+.annotation-table__body-cell {
+  font-family: inherit !important;
+  font-size: 0.875rem !important;
+  color: #111111 !important;
+  border-color: rgba(30, 41, 59, 0.08) !important;
+}
+
+/* --- Section headings & lists --- */
+#root h2 {
+  margin: 2rem 0 0.5rem;
+  font-family: inherit;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #111111;
+  border-bottom: 2px solid var(--text-strong-purple);
+  padding-bottom: 0.35rem;
+  max-width: 52rem;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: left;
+  letter-spacing: -0.02em;
+}
+
+#root h3 {
+  margin: 1rem 0 0.5rem;
+  font-family: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text-strong-purple);
+  max-width: 52rem;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: left;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Similar / disagreeing comment text (shared) */
+.result-comment {
+  font-family: inherit;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  font-weight: 400;
+  color: #111111;
+}
+
+.comment-list {
+  max-width: 52rem;
+  margin: 0 auto 1rem;
+  padding-left: 1.35rem;
+  text-align: left;
+  list-style: disc;
+}
+
+.comment-list .result-comment {
+  margin-bottom: 0.45rem;
+}
+
+.comment-list .result-comment:last-child {
+  margin-bottom: 0;
+}
+
+.disagreeing-list {
+  margin-bottom: 0;
+}
+
+.disagreeing-list__item {
+  margin-bottom: 0.85rem;
+}
+
+.disagreeing-list__item:last-child {
+  margin-bottom: 0;
+}
+
+/* One collapsible region per attribute (summary = attribute name) */
+.attribute-collapse {
+  display: block;
+  margin-bottom: 1rem;
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  background: rgba(254, 254, 254, 0.9);
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.06);
+  overflow: hidden;
+}
+
+.attribute-collapse__summary {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
   width: 100%;
+  box-sizing: border-box;
+  min-height: 3.35rem;
+  padding: 0.75rem 1rem;
+  list-style: none;
+  cursor: pointer;
+  user-select: none;
+  background: linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 100%);
+  border-bottom: 2px solid var(--text-strong-purple);
 }
 
-/* IMPORTANT: override internal control */
-.react-select__control {
-  min-height: 38px;
-  border-radius: 4px;
+.attribute-collapse__summary::-webkit-details-marker {
+  display: none;
+}
+
+.attribute-collapse__summary::marker {
+  content: "";
+}
+
+.attribute-collapse__summary::before {
+  content: "▸";
+  flex-shrink: 0;
+  width: 1.35rem;
+  text-align: center;
+  font-size: 1.1rem;
+  line-height: 1;
+  color: var(--text-strong-purple);
+  transition: transform 0.15s ease;
+}
+
+.attribute-collapse[open] > .attribute-collapse__summary::before {
+  transform: rotate(90deg);
+}
+
+.attribute-collapse__summary:focus {
+  outline: none;
+}
+
+.attribute-collapse__summary:focus-visible {
+  box-shadow: inset 0 0 0 2px rgba(127, 115, 133, 0.35);
+}
+
+#root .attribute-collapse .attribute-collapse__title {
+  margin: 0;
+  padding: 0;
+  border: none;
+  max-width: none;
+  margin-left: 0;
+  margin-right: 0;
+  flex: 1;
+  text-align: left;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #111111;
+  letter-spacing: -0.02em;
+}
+
+.attribute-collapse__body {
+  padding: 0.35rem 1rem 1rem;
+  border-top: 1px solid rgba(30, 41, 59, 0.06);
+  background: var(--bg-1);
+}
+
+/* Guiding questions tooltip: space between questions, tight lines within a question */
+.guiding-tooltip__question {
+  margin-bottom: 0.85rem;
+}
+
+.guiding-tooltip__question:last-child {
+  margin-bottom: 0;
+}
+
+.guiding-tooltip__line {
+  margin: 0;
+  line-height: 1.38;
+}
+
+.guiding-tooltip__line + .guiding-tooltip__line {
+  margin-top: 0.15rem;
+}
+
+/* --- Disagreeing comment + chart (no card border) --- */
+.chart-wrap {
+  max-width: 52rem;
+  margin: 0 auto 1.5rem;
+  padding: 0.35rem 0 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  text-align: left;
+  font-family: inherit;
+}
+
+.chart-wrap:last-child {
+  margin-bottom: 0;
+}
+
+.chart-wrap__comment {
+  margin: 0 0 0.65rem;
+}
+
+.chart-responsive {
+  width: min(100%, 34rem);
+  aspect-ratio: 7 / 4;
+  height: auto;
+  min-height: 0;
+  margin: 0 auto;
+  position: relative;
+}
+
+.chart-responsive .VictoryContainer {
+  width: 100% !important;
+  height: 100% !important;
+  pointer-events: auto !important;
+}
+
+.chart-responsive svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
 }
