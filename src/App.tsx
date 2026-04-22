@@ -180,7 +180,7 @@ const App: React.FC = () => {
     try {
       const response = await fetch('https://five65backendserver.onrender.com/chat', {
         method: 'POST',
-        body: JSON.stringify({ query: comment, attributes: selectedOptions }),
+        body: JSON.stringify({ query: comment, attributes: Array.from(selectedOptions) }),
         headers: {
           'Content-Type': 'application/json'
         }
