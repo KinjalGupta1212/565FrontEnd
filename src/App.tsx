@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useState } from "react";
 import Select from "react-select";
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -87,6 +87,7 @@ const App: React.FC = () => {
   const [displayOnSubmit, setDisplayOnSubmit] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [lastRenderedComment, setLastRenderedComment] = useState("");
+  const [lastRenderedSelectionKey, setLastRenderedSelectionKey] = useState("");
   const [guidingQuestions, setGuidingQuestions] = useState<Record<string, string[]>>({});
   const [similarComments, setSimilarComments] = useState<Record<string, string[]>>({});
   const [disagreeingComments, setDisagreeingComments] = useState<Record<string, Record<string, number>>>({});
@@ -97,7 +98,7 @@ const App: React.FC = () => {
     })
   ); 
   
-  const fetchAndRenderResults = useCallback(async (showValidationAlerts: boolean) => {
+  const fetchAndRenderResults = async (showValidationAlerts: boolean) => {
     if (selected.length === 0) {
       if (showValidationAlerts) {
         alert("Please select at least one survey item.");
@@ -154,6 +155,7 @@ const App: React.FC = () => {
       setSimilarComments(similar_comments);
       setDisagreeingComments(disagreeing_comments);
       setLastRenderedComment(comment.trim());
+      setLastRenderedSelectionKey([...selectedOptions].sort().join("|"));
       setDisplayOnSubmit(true);
       
   } catch(err){
@@ -161,27 +163,20 @@ const App: React.FC = () => {
   } finally {
     setIsLoading(false);
   }
-}, [comment, selected]);
+};
 
   const handleSubmit = async () => 
   {
-    await fetchAndRenderResults(true);
-}
-
-  useEffect(() => {
     const trimmedComment = comment.trim();
-    if (!lastRenderedComment || trimmedComment === "" || trimmedComment === lastRenderedComment) {
+    const selectionKey = selected.map((option) => option.value).sort().join("|");
+    const isSameComment = lastRenderedComment && trimmedComment === lastRenderedComment;
+    const isSameSelection = lastRenderedSelectionKey && selectionKey === lastRenderedSelectionKey;
+    if (isSameComment && isSameSelection) {
       return;
     }
 
-    setDisplayOnSubmit(false);
-    setIsLoading(true);
-    const timeoutId = window.setTimeout(() => {
-      void fetchAndRenderResults(false);
-    }, 300);
-
-    return () => window.clearTimeout(timeoutId);
-  }, [comment, lastRenderedComment, fetchAndRenderResults]);
+    await fetchAndRenderResults(true);
+}
   return (
   <>
   <div className="form-intro">
@@ -258,7 +253,12 @@ const App: React.FC = () => {
       <Table className="annotation-table__table" sx={{ minWidth: 650 }} aria-label="annotation results">
         <TableHead>
           <TableRow>
-            <TableCell align="left" className="annotation-table__head-cell">Comment</TableCell>
+            <TableCell
+              align="left"
+              className="annotation-table__head-cell annotation-table__comment-head-cell"
+            >
+              Comment
+            </TableCell>
             {displayAttributesForTable.map((key) => (
               <TableCell align="left" key={key.label} className="annotation-table__head-cell">
                 <div className="annotation-table__head-wrap">
@@ -292,11 +292,11 @@ const App: React.FC = () => {
         </TableHead>
         <TableBody>
           {table_rows.map((row) => {
-            const isSuggestionRow = row.name === "suggestion";
+            const isSuggestionRow = row.name === "LLM Suggestion For Your Comment";
             return <>
               <TableRow
                 key={row.name}
-                className="annotation-table__body-row"
+                className={`annotation-table__body-row ${isSuggestionRow ? "annotation-table__body-row--suggestion" : ""}`}
                 sx={{
                   '&:last-child td, &:last-child th': { border: 0 }
                 }}

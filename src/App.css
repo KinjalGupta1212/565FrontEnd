@@ -312,6 +312,7 @@
 
 .annotation-table__body-row:nth-child(even) {
   background: #f8fafc;
+  position: relative;
 }
 
 .annotation-table__body-row:hover {
@@ -323,9 +324,45 @@
   font-weight: 600 !important;
   font-size: 0.875rem !important;
   color: #0f172a !important;
+  width: 18rem;
+  min-width: 18rem;
   max-width: 18rem;
   vertical-align: top;
   border-color: rgba(30, 41, 59, 0.08) !important;
+}
+
+.annotation-table__comment-head-cell,
+.annotation-table__comment-cell {
+  position: sticky;
+  left: 0;
+}
+
+.annotation-table__comment-head-cell {
+  z-index: 4;
+  width: 18rem;
+  min-width: 18rem;
+  max-width: 18rem;
+  box-shadow: 2px 0 0 rgba(30, 41, 59, 0.08);
+}
+
+.annotation-table__comment-cell {
+  z-index: 15;
+  background: #ffffff;
+  box-shadow: 2px 0 0 rgba(30, 41, 59, 0.08);
+  background-clip: padding-box;
+  overflow: hidden;
+}
+
+.annotation-table__body-row:nth-child(even) .annotation-table__comment-cell {
+  background: #f8fafc;
+}
+
+.annotation-table__body-row:hover .annotation-table__comment-cell {
+  background: #f1f5f9;
+}
+
+.annotation-table__body-row--suggestion .annotation-table__comment-cell {
+  background: #ece7f1 !important;
 }
 
 .annotation-table__body-cell {
@@ -333,6 +370,10 @@
   font-size: 0.875rem !important;
   color: #111111 !important;
   border-color: rgba(30, 41, 59, 0.08) !important;
+  position: relative;
+  z-index: 1;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 /* --- Section headings & lists --- */
