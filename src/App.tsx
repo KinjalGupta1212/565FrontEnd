@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Select from "react-select";
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -85,6 +85,8 @@ const App: React.FC = () => {
   const [tableInfo, setTableInfo] = useState<Record<string, Record<string, string[]>>>({});
   const [displayAttributesForTable, setDisplayAttributesForTable] = useState<Option[]>([]);
   const [displayOnSubmit, setDisplayOnSubmit] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [lastRenderedComment, setLastRenderedComment] = useState("");
   const [guidingQuestions, setGuidingQuestions] = useState<Record<string, string[]>>({});
   const [similarComments, setSimilarComments] = useState<Record<string, string[]>>({});
   const [disagreeingComments, setDisagreeingComments] = useState<Record<string, Record<string, number>>>({});
@@ -94,89 +96,29 @@ const App: React.FC = () => {
       labels: rating,
     })
   ); 
-
-// const mockTableInfo = {
-//    "sentiment":{
-//          "questions":[
-//                "Does the comment express a dislike or hatred towards a specific group?",
-//                "Is there any indication of violent intentions or wishes in the comment?",
-//                "Does the comment use strong language to convey negative feelings towards the group?"
-//               ],
-//       "similar_comments":[
-//          "Hate from india",
-//          "You sure love to hate on Indians."
-//       ],
-//       "disagreeing_comments":{
-//          "As an Indian I love this post":{
-//             "strongly negative":0,
-//             "somewhat negative":0,
-//             "neutral":1,
-//             "somewhat positive":1,
-//             "strongly positive":1
-//          },
-//          "LOL. Barbaric and brainwashed clowns making comments about India... They love to display their ignorance and stupidity, which is a result of their limited intelligence.":{
-//             "strongly negative":0,
-//             "somewhat negative":1,
-//             "neutral":0,
-//             "somewhat positive":1,
-//             "strongly positive":0
-//          }
-//       }
-//    },
-//    "table_info":{
-//       "Hate from india":
-//         {
-//          "sentiment":["somewhat negative"]
-//         }
-//       ,
-//       "You sure love to hate on Indians.":
-//         {
-//          "sentiment": ["neutral"]
-//         }
-//       ,
-//       "I hate Indians they are terrorists. Killing thousands people in Kashmir.":
-//         { 
-//          "sentiment": ["strongly negative"] 
-//         }
-//       ,
-//       "now we hate india lot of more":
-//         { 
-//          "sentiment": ["somewhat negative"]
-//         }
-//       ,
-//       "Only motherfuckers hate India,":
-//         { 
-//           "sentiment": ["somewhat negative"]
-//         }
-//       ,
-//       "suggestion":
-//          { 
-//             "sentiment":
-//             [
-//               "strongly negative",
-//               "somewhat negative",
-//               "neutral"
-//             ]
-//         }
-    
-//    },
-//    "targeted_subgroups":[
-//       "{\"National origin or citizenship status\": [\"A specific country\"]}"
-//    ]
-// }
   
-  const handleSubmit = async () => 
-  {
+  const fetchAndRenderResults = useCallback(async (showValidationAlerts: boolean) => {
     if (selected.length === 0) {
-      alert("Please select at least one survey item.");
+      if (showValidationAlerts) {
+        alert("Please select at least one survey item.");
+      }
+      setIsLoading(false);
+      setDisplayOnSubmit(false);
       return;
     }
-    if (comment === "") {
-      alert("Please put in a comment to annotate.");
+    if (comment.trim() === "") {
+      if (showValidationAlerts) {
+        alert("Please put in a comment to annotate.");
+      }
+      setIsLoading(false);
+      setDisplayOnSubmit(false);
       return;
     }
+
     const selectedOptions = new Set(selected.map((option) => option.value));
     setDisplayAttributesForTable(selected);
+    setIsLoading(true);
+    setDisplayOnSubmit(false);
     console.log({
   query: comment,
   attributes: [...selectedOptions]
@@ -211,12 +153,35 @@ const App: React.FC = () => {
       setTableInfo(data.table_info);
       setSimilarComments(similar_comments);
       setDisagreeingComments(disagreeing_comments);
-      setDisplayOnSubmit(true); 
+      setLastRenderedComment(comment.trim());
+      setDisplayOnSubmit(true);
       
   } catch(err){
     console.log(err);
+  } finally {
+    setIsLoading(false);
   }
+}, [comment, selected]);
+
+  const handleSubmit = async () => 
+  {
+    await fetchAndRenderResults(true);
 }
+
+  useEffect(() => {
+    const trimmedComment = comment.trim();
+    if (!lastRenderedComment || trimmedComment === "" || trimmedComment === lastRenderedComment) {
+      return;
+    }
+
+    setDisplayOnSubmit(false);
+    setIsLoading(true);
+    const timeoutId = window.setTimeout(() => {
+      void fetchAndRenderResults(false);
+    }, 300);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [comment, lastRenderedComment, fetchAndRenderResults]);
   return (
   <>
   <div className="form-intro">
@@ -265,7 +230,15 @@ const App: React.FC = () => {
 
   </div>
 
-    {displayOnSubmit && (
+    {isLoading && (
+    <div className="info-blurb">
+      <p className="info-blurb__lead">Loading updated results...</p>
+      <p className="info-blurb__para">
+        Re-rendering the table and attribute comparison sections for your updated comment.
+      </p>
+    </div>
+    )}
+    {displayOnSubmit && !isLoading && (
     <div className="info-blurb">
       <p className="info-blurb__lead">
         The table below shows five example comments that are semantically similar to your input.
@@ -357,7 +330,7 @@ const App: React.FC = () => {
       </Table>
     </TableContainer>
     )}
-    {displayOnSubmit && (
+    {displayOnSubmit && !isLoading && (
     <div className="info-blurb">
       <p className="info-blurb__lead">
         For each attribute below, you’ll see two kinds of comparisons: comments with{" "}
@@ -374,7 +347,7 @@ const App: React.FC = () => {
       </p>
     </div>
     )}
-    {displayOnSubmit && displayAttributesForTable.map((key) => (
+    {displayOnSubmit && !isLoading && displayAttributesForTable.map((key) => (
       <details key={key.value} className="attribute-collapse" open>
         <summary className="attribute-collapse__summary">
           <h2 className="attribute-collapse__title">{key.label}</h2>
