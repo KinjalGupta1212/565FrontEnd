@@ -177,10 +177,14 @@ const App: React.FC = () => {
     }
     const selectedOptions = new Set(selected.map((option) => option.value));
     setDisplayAttributesForTable(selected);
+    console.log({
+  query: comment,
+  attributes: [...selectedOptions]
+});
     try {
       const response = await fetch('https://five65backendserver.onrender.com/chat', {
         method: 'POST',
-        body: JSON.stringify({ query: comment, attributes: Array.from(selectedOptions) }),
+        body: JSON.stringify({ text: comment, attributes: Array.from(selectedOptions) }),
         headers: {
           'Content-Type': 'application/json'
         }
