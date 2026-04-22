@@ -374,7 +374,7 @@ const App: React.FC = () => {
       </p>
     </div>
     )}
-    {displayAttributesForTable.map((key) => (
+    {displayOnSubmit && displayAttributesForTable.map((key) => (
       <details key={key.value} className="attribute-collapse" open>
         <summary className="attribute-collapse__summary">
           <h2 className="attribute-collapse__title">{key.label}</h2>
