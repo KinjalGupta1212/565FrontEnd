@@ -95,103 +95,102 @@ const App: React.FC = () => {
     })
   ); 
 
-
-const mockTableInfo = {
-   "sentiment":{
-         "questions":[
-               "Does the comment express a dislike or hatred towards a specific group?",
-               "Is there any indication of violent intentions or wishes in the comment?",
-               "Does the comment use strong language to convey negative feelings towards the group?"
-              ],
-      "similar_comments":[
-         "Hate from india",
-         "You sure love to hate on Indians."
-      ],
-      "disagreeing_comments":{
-         "As an Indian I love this post":{
-            "strongly negative":0,
-            "somewhat negative":0,
-            "neutral":1,
-            "somewhat positive":1,
-            "strongly positive":1
-         },
-         "LOL. Barbaric and brainwashed clowns making comments about India... They love to display their ignorance and stupidity, which is a result of their limited intelligence.":{
-            "strongly negative":0,
-            "somewhat negative":1,
-            "neutral":0,
-            "somewhat positive":1,
-            "strongly positive":0
-         }
-      }
-   },
-   "table_info":{
-      "Hate from india":
-        {
-         "sentiment":["somewhat negative"]
-        }
-      ,
-      "You sure love to hate on Indians.":
-        {
-         "sentiment": ["neutral"]
-        }
-      ,
-      "I hate Indians they are terrorists. Killing thousands people in Kashmir.":
-        { 
-         "sentiment": ["strongly negative"] 
-        }
-      ,
-      "now we hate india lot of more":
-        { 
-         "sentiment": ["somewhat negative"]
-        }
-      ,
-      "Only motherfuckers hate India,":
-        { 
-          "sentiment": ["somewhat negative"]
-        }
-      ,
-      "suggestion":
-         { 
-            "sentiment":
-            [
-              "strongly negative",
-              "somewhat negative",
-              "neutral"
-            ]
-        }
+// const mockTableInfo = {
+//    "sentiment":{
+//          "questions":[
+//                "Does the comment express a dislike or hatred towards a specific group?",
+//                "Is there any indication of violent intentions or wishes in the comment?",
+//                "Does the comment use strong language to convey negative feelings towards the group?"
+//               ],
+//       "similar_comments":[
+//          "Hate from india",
+//          "You sure love to hate on Indians."
+//       ],
+//       "disagreeing_comments":{
+//          "As an Indian I love this post":{
+//             "strongly negative":0,
+//             "somewhat negative":0,
+//             "neutral":1,
+//             "somewhat positive":1,
+//             "strongly positive":1
+//          },
+//          "LOL. Barbaric and brainwashed clowns making comments about India... They love to display their ignorance and stupidity, which is a result of their limited intelligence.":{
+//             "strongly negative":0,
+//             "somewhat negative":1,
+//             "neutral":0,
+//             "somewhat positive":1,
+//             "strongly positive":0
+//          }
+//       }
+//    },
+//    "table_info":{
+//       "Hate from india":
+//         {
+//          "sentiment":["somewhat negative"]
+//         }
+//       ,
+//       "You sure love to hate on Indians.":
+//         {
+//          "sentiment": ["neutral"]
+//         }
+//       ,
+//       "I hate Indians they are terrorists. Killing thousands people in Kashmir.":
+//         { 
+//          "sentiment": ["strongly negative"] 
+//         }
+//       ,
+//       "now we hate india lot of more":
+//         { 
+//          "sentiment": ["somewhat negative"]
+//         }
+//       ,
+//       "Only motherfuckers hate India,":
+//         { 
+//           "sentiment": ["somewhat negative"]
+//         }
+//       ,
+//       "suggestion":
+//          { 
+//             "sentiment":
+//             [
+//               "strongly negative",
+//               "somewhat negative",
+//               "neutral"
+//             ]
+//         }
     
-   },
-   "targeted_subgroups":[
-      "{\"National origin or citizenship status\": [\"A specific country\"]}"
-   ]
-}
+//    },
+//    "targeted_subgroups":[
+//       "{\"National origin or citizenship status\": [\"A specific country\"]}"
+//    ]
+// }
   
   const handleSubmit = async () => 
   {
     if (selected.length === 0) {
-      alert("Please select at least one survey item");
+      alert("Please select at least one survey item.");
       return;
     }
     if (comment === "") {
-      alert("Please put in a comment to annotate");
+      alert("Please put in a comment to annotate.");
       return;
     }
     const selectedOptions = new Set(selected.map((option) => option.value));
     setDisplayAttributesForTable(selected);
     try {
-      // const response = await fetch('http://localhost:8000/chat', {
-      //   method: 'POST',
-      //   body: JSON.stringify({ query: comment, attributes: selected_options }),
-      //   headers: {
-      //     'Content-Type': 'application/json'
-      //   }
-      // });
+      const response = await fetch('https://five65backendserver.onrender.com/chat', {
+        method: 'POST',
+        body: JSON.stringify({ query: comment, attributes: selectedOptions }),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
     
-      // const data = await response.json();
+      const data = await response.json();
       let guiding_questions: Record<string, string[]> = {};
       let similar_comments: Record<string, string[]> = {};
       let disagreeing_comments: Record<string, Record<string, number>> = {};
-      for (const key of Object.keys(mockTableInfo))
+      for (const key of Object.keys(data))
       {
         if (key === "table_info" || key === "targeted_subgroups" || !selectedOptions.has(key))
         {
@@ -199,13 +198,13 @@ const mockTableInfo = {
         }
         else
         {
-          guiding_questions[key] = mockTableInfo[key]["questions"];
-          similar_comments[key] = mockTableInfo[key]["similar_comments"];
-          disagreeing_comments[key] = mockTableInfo[key]["disagreeing_comments"];
+          guiding_questions[key] = data[key]["questions"];
+          similar_comments[key] = data[key]["similar_comments"];
+          disagreeing_comments[key] = data[key]["disagreeing_comments"];
         }
       }
       setGuidingQuestions(guiding_questions);
-      setTableInfo(mockTableInfo.table_info);
+      setTableInfo(data.table_info);
       setSimilarComments(similar_comments);
       setDisagreeingComments(disagreeing_comments);
       setDisplayOnSubmit(true); 
@@ -218,6 +217,15 @@ const mockTableInfo = {
   <>
   <div className="form-intro">
     <h1 className="app-title">Data Annotation Assistant</h1>
+  </div>
+  <div className="info-blurb form-blurb">
+    <p className="info-blurb__lead">
+      Enter the comment you want to annotate and select the survey items where you need help.
+    </p>
+    <p className="info-blurb__para">
+      Add your annotation comment in the text box, then choose one or more survey items from the
+      dropdown before submitting.
+    </p>
   </div>
   <div className="form-container">
 
@@ -240,7 +248,7 @@ const mockTableInfo = {
         options={options}
         value={selected}
         onChange={(newValue) => setSelected(newValue as Option[])}
-        placeholder="Select options..."
+        placeholder="Select survey items..."
       />
     </div>
 
@@ -252,20 +260,22 @@ const mockTableInfo = {
     </div>
 
   </div>
-  
-    {/* <div style={{ width: 300, margin: "50px auto", display: "flex", flexDirection: "column" }}>
-      <Select
-        isMulti
-        options={options}
-        value={selected}
-        onChange={(newValue) => setSelected(newValue as Option[])}
-        placeholder="Select options..."
-      />
-      <input type="text" onChange={(e) => setComment(e.target.value)}></input>
-      <button onClick={handleSubmit}>Submit</button>
-    </div> */}
-    {/* <input type="text" onChange={(e) => setComment(e.target.value)}></input>
-    <button onClick={handleSubmit}>Submit</button> */}
+
+    {displayOnSubmit && (
+    <div className="info-blurb">
+      <p className="info-blurb__lead">
+        The table below shows five example comments that are semantically similar to your input.
+      </p>
+      <p className="info-blurb__para">
+        For each selected survey item, the ratings shown are the average outcomes from past
+        annotators on those similar comments.
+      </p>
+      <p className="info-blurb__para">
+        The final row labeled <strong>suggestion</strong> contains suggested LLM ratings for your
+        input comment.
+      </p>
+    </div>
+    )}
     {displayOnSubmit && (
     <TableContainer component={Paper} className="annotation-table" elevation={0}>
       <Table className="annotation-table__table" sx={{ minWidth: 650 }} aria-label="annotation results">
@@ -305,19 +315,32 @@ const mockTableInfo = {
         </TableHead>
         <TableBody>
           {table_rows.map((row) => {
+            const isSuggestionRow = row.name === "suggestion";
             return <>
               <TableRow
                 key={row.name}
                 className="annotation-table__body-row"
-                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                sx={{
+                  '&:last-child td, &:last-child th': { border: 0 }
+                }}
               >
-                <TableCell component="th" scope="row" className="annotation-table__comment-cell">
+                <TableCell
+                  component="th"
+                  scope="row"
+                  className="annotation-table__comment-cell"
+                  sx={{ backgroundColor: isSuggestionRow ? "#ece7f1" : "inherit" }}
+                >
                   {row.name}
                 </TableCell>
                 {displayAttributesForTable.map((attribute) => {
                   const ratings = row.labels[attribute.value] || [];
                   return (
-                    <TableCell key={attribute.value} align="left" className="annotation-table__body-cell">
+                    <TableCell
+                      key={attribute.value}
+                      align="left"
+                      className="annotation-table__body-cell"
+                      sx={{ backgroundColor: isSuggestionRow ? "#ece7f1" : "inherit" }}
+                    >
                       {ratings.join(", ")}
                     </TableCell>
                   );
