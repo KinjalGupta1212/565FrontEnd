@@ -75,7 +75,7 @@ const options: Option[] = [
   { label: "Dehumanize", value: "dehumanize" },
   { label: "Violence", value: "violence" },
   { label: "Genocide", value: "genocide" },
-  { label: "Attack-Defend", value: "attack_defent" },
+  { label: "Attack-Defend", value: "attack_defend" },
   { label: "Hate speech", value: "hatespeech" },
 ];
 
