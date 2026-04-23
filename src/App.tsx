@@ -256,6 +256,7 @@ const App: React.FC = () => {
         className="react-select-container"
         classNamePrefix="react-select"
         isMulti
+        closeMenuOnSelect={false}
         options={options}
         value={selected}
         onChange={(newValue) => setSelected(newValue as Option[])}
