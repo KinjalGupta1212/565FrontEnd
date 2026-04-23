@@ -290,7 +290,7 @@ const App: React.FC = () => {
         annotators on those similar comments.
       </p>
       <p className="info-blurb__para">
-        The final row labeled <strong>suggestion</strong> contains suggested LLM ratings for your
+        The final row contains a range of suggested LLM ratings for your
         input comment.
       </p>
     </div>
@@ -354,7 +354,7 @@ const App: React.FC = () => {
                   className="annotation-table__comment-cell"
                   sx={{ backgroundColor: isSuggestionRow ? "#ece7f1" : "inherit" }}
                 >
-                  {row.name}
+                  <div className="annotation-table__comment-content">{row.name}</div>
                 </TableCell>
                 {displayAttributesForTable.map((attribute) => {
                   const ratings = row.labels[attribute.value] || [];
