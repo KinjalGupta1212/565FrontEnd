@@ -351,6 +351,9 @@
   max-width: 18rem;
   vertical-align: top;
   border-color: rgba(30, 41, 59, 0.08) !important;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .annotation-table__comment-head-cell,
@@ -373,6 +376,7 @@
   box-shadow: 2px 0 0 rgba(30, 41, 59, 0.08);
   background-clip: padding-box;
   overflow: hidden;
+  text-overflow: clip;
 }
 
 .annotation-table__body-row:nth-child(even) .annotation-table__comment-cell {
