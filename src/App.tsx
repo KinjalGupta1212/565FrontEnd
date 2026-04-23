@@ -285,8 +285,8 @@ const App: React.FC = () => {
   </div>
 
     {isLoading && (
-    <div className="info-blurb">
-      <p className="info-blurb__lead loading-blurb__lead">
+    <div className="loading-state" role="status" aria-live="polite">
+      <p className="loading-blurb__lead">
         <span className="loading-spinner" aria-hidden="true" />
         Loading results...
       </p>
