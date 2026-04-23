@@ -261,6 +261,7 @@
 .annotation-table__table {
   border-collapse: separate;
   border-spacing: 0;
+  position: relative;
 }
 
 .annotation-table__head-cell {
@@ -332,12 +333,22 @@
   margin-top: 1px;
 }
 
-.annotation-table__body-row:nth-child(even) {
-  background: #f8fafc;
+.annotation-table__body-row {
   position: relative;
 }
 
-.annotation-table__body-row:hover {
+.annotation-table__body-row > .annotation-table__comment-cell,
+.annotation-table__body-row > .annotation-table__body-cell {
+  background: #ffffff;
+}
+
+.annotation-table__body-row:nth-child(even) > .annotation-table__comment-cell,
+.annotation-table__body-row:nth-child(even) > .annotation-table__body-cell {
+  background: #f8fafc;
+}
+
+.annotation-table__body-row:hover > .annotation-table__comment-cell,
+.annotation-table__body-row:hover > .annotation-table__body-cell {
   background: #f1f5f9;
 }
 
@@ -360,18 +371,20 @@
 }
 
 .annotation-table__comment-head-cell {
-  z-index: 4;
+  z-index: 40;
   width: 18rem;
   min-width: 18rem;
   max-width: 18rem;
   box-shadow: 2px 0 0 rgba(30, 41, 59, 0.08);
+  isolation: isolate;
 }
 
 .annotation-table__comment-cell {
-  z-index: 15;
+  z-index: 30;
   background: #ffffff;
   box-shadow: 2px 0 0 rgba(30, 41, 59, 0.08);
   background-clip: padding-box;
+  isolation: isolate;
 }
 
 .annotation-table__comment-content {
@@ -401,7 +414,7 @@
   color: #111111 !important;
   border-color: rgba(30, 41, 59, 0.08) !important;
   position: relative;
-  z-index: 1;
+  z-index: 0;
   overflow-wrap: anywhere;
   word-break: break-word;
 }
