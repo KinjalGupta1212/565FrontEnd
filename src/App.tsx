@@ -274,10 +274,7 @@ const App: React.FC = () => {
 
     {isLoading && (
     <div className="info-blurb">
-      <p className="info-blurb__lead">Loading updated results...</p>
-      <p className="info-blurb__para">
-        Re-rendering the table and attribute comparison sections for your updated comment.
-      </p>
+      <p className="info-blurb__lead">Loading results...</p>
     </div>
     )}
     {displayOnSubmit && !isLoading && (
@@ -379,7 +376,7 @@ const App: React.FC = () => {
     )}
     {displayOnSubmit && !isLoading && (
     <div className="info-blurb">
-      <p className="info-blurb__lead">Targeted subgroups identified for this comment:</p>
+      <p className="info-blurb__lead">The groups targeted by your comment:</p>
       {targetedSubgroups.length > 0 ? (
         <ul className="comment-list">
           {targetedSubgroups.map((subgroup, index) => (
