@@ -66,6 +66,51 @@ type Option = {
   value: string;
 };
 
+const normalizeTargetedSubgroups = (raw: unknown): string[] => {
+  const toDisplayLines = (value: unknown): string[] => {
+    if (typeof value === "string") {
+      const trimmed = value.trim();
+      if (!trimmed) return [];
+      if ((trimmed.startsWith("{") && trimmed.endsWith("}")) || (trimmed.startsWith("[") && trimmed.endsWith("]"))) {
+        try {
+          return toDisplayLines(JSON.parse(trimmed));
+        } catch {
+          return [trimmed];
+        }
+      }
+      return [trimmed];
+    }
+
+    if (Array.isArray(value)) {
+      return value.flatMap((item) => toDisplayLines(item));
+    }
+
+    if (value && typeof value === "object") {
+      const entries = Object.entries(value as Record<string, unknown>);
+      return entries.flatMap(([key, val]) => {
+        if (Array.isArray(val)) {
+          const items = val
+            .map((v) => (typeof v === "string" ? v.trim() : String(v)))
+            .filter(Boolean);
+          return items.length ? [`${key}: ${items.join(", ")}`] : [key];
+        }
+        if (typeof val === "string" && val.trim()) {
+          return [`${key}: ${val.trim()}`];
+        }
+        if (val == null) {
+          return [key];
+        }
+        return [`${key}: ${String(val)}`];
+      });
+    }
+
+    if (value == null) return [];
+    return [String(value)];
+  };
+
+  return [...new Set(toDisplayLines(raw).filter(Boolean))];
+};
+
 const options: Option[] = [
   { label: "Sentiment", value: "sentiment" },
   { label: "Respect", value: "respect" },
@@ -155,7 +200,7 @@ const App: React.FC = () => {
       setTableInfo(data.table_info);
       setSimilarComments(similar_comments);
       setDisagreeingComments(disagreeing_comments);
-      setTargetedSubgroups(Array.isArray(data.targeted_subgroups) ? data.targeted_subgroups : []);
+      setTargetedSubgroups(normalizeTargetedSubgroups(data.targeted_subgroups));
       setLastRenderedComment(comment.trim());
       setLastRenderedSelectionKey([...selectedOptions].sort().join("|"));
       setDisplayOnSubmit(true);
