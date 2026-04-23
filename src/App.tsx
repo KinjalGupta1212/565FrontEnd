@@ -274,7 +274,10 @@ const App: React.FC = () => {
 
     {isLoading && (
     <div className="info-blurb">
-      <p className="info-blurb__lead">Loading results...</p>
+      <p className="info-blurb__lead loading-blurb__lead">
+        <span className="loading-spinner" aria-hidden="true" />
+        Loading results...
+      </p>
     </div>
     )}
     {displayOnSubmit && !isLoading && (
