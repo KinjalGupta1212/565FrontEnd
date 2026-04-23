@@ -88,6 +88,7 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [lastRenderedComment, setLastRenderedComment] = useState("");
   const [lastRenderedSelectionKey, setLastRenderedSelectionKey] = useState("");
+  const [targetedSubgroups, setTargetedSubgroups] = useState<string[]>([]);
   const [guidingQuestions, setGuidingQuestions] = useState<Record<string, string[]>>({});
   const [similarComments, setSimilarComments] = useState<Record<string, string[]>>({});
   const [disagreeingComments, setDisagreeingComments] = useState<Record<string, Record<string, number>>>({});
@@ -154,6 +155,7 @@ const App: React.FC = () => {
       setTableInfo(data.table_info);
       setSimilarComments(similar_comments);
       setDisagreeingComments(disagreeing_comments);
+      setTargetedSubgroups(Array.isArray(data.targeted_subgroups) ? data.targeted_subgroups : []);
       setLastRenderedComment(comment.trim());
       setLastRenderedSelectionKey([...selectedOptions].sort().join("|"));
       setDisplayOnSubmit(true);
@@ -329,6 +331,22 @@ const App: React.FC = () => {
         </TableBody>
       </Table>
     </TableContainer>
+    )}
+    {displayOnSubmit && !isLoading && (
+    <div className="info-blurb">
+      <p className="info-blurb__lead">Targeted subgroups identified for this comment:</p>
+      {targetedSubgroups.length > 0 ? (
+        <ul className="comment-list">
+          {targetedSubgroups.map((subgroup, index) => (
+            <li key={`${subgroup}-${index}`} className="result-comment">
+              {subgroup}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="info-blurb__para">No targeted subgroups were identified.</p>
+      )}
+    </div>
     )}
     {displayOnSubmit && !isLoading && (
     <div className="info-blurb">
