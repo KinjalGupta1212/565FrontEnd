@@ -338,8 +338,8 @@ const App: React.FC = () => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {table_rows.map((row) => {
-            const isSuggestionRow = row.name === "LLM Suggestion For Your Comment";
+          {table_rows.map((row, index) => {
+            const isSuggestionRow = index === table_rows.length - 1;
             return <>
               <TableRow
                 key={row.name}
