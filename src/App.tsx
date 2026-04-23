@@ -67,6 +67,17 @@ type Option = {
 };
 
 const normalizeTargetedSubgroups = (raw: unknown): string[] => {
+  const isNoneLike = (text: string): boolean => {
+    const normalized = text.toLowerCase().trim();
+    return (
+      normalized === "none" ||
+      normalized === "none: none" ||
+      normalized === "n/a" ||
+      normalized === "na" ||
+      normalized === "null"
+    );
+  };
+
   const toDisplayLines = (value: unknown): string[] => {
     if (typeof value === "string") {
       const trimmed = value.trim();
@@ -108,7 +119,7 @@ const normalizeTargetedSubgroups = (raw: unknown): string[] => {
     return [String(value)];
   };
 
-  return [...new Set(toDisplayLines(raw).filter(Boolean))];
+  return [...new Set(toDisplayLines(raw).map((line) => line.trim()).filter((line) => line && !isNoneLike(line)))];
 };
 
 const options: Option[] = [
