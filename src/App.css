@@ -6,6 +6,8 @@
   --border-soft: #d5d5d5;
   --text-soft-purple: #b8acc0;
   --text-strong-purple: #7f7385;
+  --table-suggestion-row-bg: #e4daf0;
+  --table-suggestion-row-bg-hover: #d9c9e5;
 }
 
 #root {
@@ -404,8 +406,14 @@
   background: #f1f5f9;
 }
 
-.annotation-table__body-row--suggestion .annotation-table__comment-cell {
-  background: #ece7f1 !important;
+.annotation-table__body-row--suggestion > .annotation-table__comment-cell,
+.annotation-table__body-row--suggestion > .annotation-table__body-cell {
+  background: var(--table-suggestion-row-bg) !important;
+}
+
+.annotation-table__body-row--suggestion:hover > .annotation-table__comment-cell,
+.annotation-table__body-row--suggestion:hover > .annotation-table__body-cell {
+  background: var(--table-suggestion-row-bg-hover) !important;
 }
 
 .annotation-table__body-cell {

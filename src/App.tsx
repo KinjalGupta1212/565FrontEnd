@@ -352,7 +352,6 @@ const App: React.FC = () => {
                   component="th"
                   scope="row"
                   className="annotation-table__comment-cell"
-                  sx={{ backgroundColor: isSuggestionRow ? "#ece7f1" : "inherit" }}
                 >
                   <div className="annotation-table__comment-content">{row.name}</div>
                 </TableCell>
@@ -363,7 +362,6 @@ const App: React.FC = () => {
                       key={attribute.value}
                       align="left"
                       className="annotation-table__body-cell"
-                      sx={{ backgroundColor: isSuggestionRow ? "#ece7f1" : "inherit" }}
                     >
                       {ratings.join(", ")}
                     </TableCell>
