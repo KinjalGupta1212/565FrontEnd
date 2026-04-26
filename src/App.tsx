@@ -307,6 +307,22 @@ const App: React.FC = () => {
       </p>
     </div>
     )}
+    {displayOnSubmit && !isLoading && (
+    <div className="info-blurb">
+      <p className="info-blurb__lead">The groups targeted by your comment:</p>
+      {targetedSubgroups.length > 0 ? (
+        <ul className="comment-list">
+          {targetedSubgroups.map((subgroup, index) => (
+            <li key={`${subgroup}-${index}`} className="result-comment">
+              {subgroup}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="info-blurb__para">No targeted groups were identified.</p>
+      )}
+    </div>
+    )}
     {displayOnSubmit && (
     <TableContainer component={Paper} className="annotation-table" elevation={0}>
       <Table className="annotation-table__table" sx={{ minWidth: 650 }} aria-label="annotation results">
@@ -386,22 +402,6 @@ const App: React.FC = () => {
         </TableBody>
       </Table>
     </TableContainer>
-    )}
-    {displayOnSubmit && !isLoading && (
-    <div className="info-blurb">
-      <p className="info-blurb__lead">The groups targeted by your comment:</p>
-      {targetedSubgroups.length > 0 ? (
-        <ul className="comment-list">
-          {targetedSubgroups.map((subgroup, index) => (
-            <li key={`${subgroup}-${index}`} className="result-comment">
-              {subgroup}
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p className="info-blurb__para">No targeted subgroups were identified.</p>
-      )}
-    </div>
     )}
     {displayOnSubmit && !isLoading && (
     <div className="info-blurb">
