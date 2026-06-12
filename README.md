@@ -1,4 +1,4 @@
-# 565 Final Project - Frontend
+# RAG Assistant - Frontend
 
 Built with React, Vite, and Typescript. Utilized Cursor for rapid iteration of interface.
 
