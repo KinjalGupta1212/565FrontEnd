@@ -396,6 +396,7 @@ const App: React.FC = () => {
                           {ratings.map((rating, ratingIndex) => (
                             <div key={ratingIndex} className="annotation-table__suggestion-rating">
                               {ratingIndex === 0 ? <strong>{rating}</strong> : rating}
+                              {ratingIndex < ratings.length - 1 ? "," : null}
                             </div>
                           ))}
                         </div>
