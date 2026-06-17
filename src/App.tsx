@@ -303,7 +303,7 @@ const App: React.FC = () => {
       </p>
       <p className="info-blurb__para">
         The final row contains a range of suggested LLM ratings for your
-        input comment.
+        input comment. The first listed rating is the rating that the LLM believes is most fitting.
       </p>
     </div>
     )}
@@ -391,7 +391,14 @@ const App: React.FC = () => {
                       align="left"
                       className="annotation-table__body-cell"
                     >
-                      {ratings.join(", ")}
+                      {isSuggestionRow && ratings.length > 0 ? (
+                        <>
+                          <strong>{ratings[0]}</strong>
+                          {ratings.length > 1 ? `, ${ratings.slice(1).join(", ")}` : null}
+                        </>
+                      ) : (
+                        ratings.join(", ")
+                      )}
                     </TableCell>
                   );
                 })}
