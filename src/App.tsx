@@ -392,10 +392,13 @@ const App: React.FC = () => {
                       className="annotation-table__body-cell"
                     >
                       {isSuggestionRow && ratings.length > 0 ? (
-                        <>
-                          <strong>{ratings[0]}</strong>
-                          {ratings.length > 1 ? `, ${ratings.slice(1).join(", ")}` : null}
-                        </>
+                        <div className="annotation-table__suggestion-ratings">
+                          {ratings.map((rating, ratingIndex) => (
+                            <div key={ratingIndex} className="annotation-table__suggestion-rating">
+                              {ratingIndex === 0 ? <strong>{rating}</strong> : rating}
+                            </div>
+                          ))}
+                        </div>
                       ) : (
                         ratings.join(", ")
                       )}

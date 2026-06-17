@@ -430,6 +430,12 @@
   background: var(--table-suggestion-row-bg-hover) !important;
 }
 
+.annotation-table__suggestion-ratings {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
 .annotation-table__body-cell {
   font-family: inherit !important;
   font-size: 0.875rem !important;
